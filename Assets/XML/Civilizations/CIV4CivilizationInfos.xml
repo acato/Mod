@@ -432,10 +432,6 @@
 					<UnitClassType>UNITCLASS_COLONIST</UnitClassType>
 					<FreeUnitProfession>PROFESSION_DRAGOON</FreeUnitProfession>
 				</FreeUnitClass>
-				<FreeUnitClass>
-					<UnitClassType>UNITCLASS_ROYAL_FRIGATE</UnitClassType>
-					<FreeUnitProfession>NONE</FreeUnitProfession>
-				</FreeUnitClass>
 			</FreeUnitClasses>
 			<FreeBuildingClasses>
 				<FreeBuildingClass>
