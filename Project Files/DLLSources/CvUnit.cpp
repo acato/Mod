@@ -3622,9 +3622,13 @@ bool CvUnit::canMoveInto(CvPlot const& kPlot, bool bAttack, bool bDeclareWar, bo
 	case DOMAIN_SEA:
 		if (!kPlot.isWater() && !m_pUnitInfo->isCanMoveAllTerrain())
 		{
-			if (!kPlot.isFriendlyCity(*this, true) || !kPlot.isCoastalLand())
+			// Canal chain: ships can always enter canal tiles (ship-size filter is handled separately above)
+			if (!kPlot.isCanal())
 			{
-				return false;
+				if (!kPlot.isFriendlyCity(*this, true) || !kPlot.isCoastalLand())
+				{
+					return false;
+				}
 			}
 		}
 
