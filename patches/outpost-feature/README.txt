@@ -7,8 +7,9 @@ resources from bonus tiles outside your cultural borders.
 How it works:
 - A pioneer builds an outpost on an unowned tile with a scavengeable bonus
   (furs or wood). The pioneer is consumed during construction.
-- Each turn the outpost gathers yield (base + terrain + bonus) as if a free
-  colonist were working the tile.
+- Each turn the outpost gathers yield (base + terrain + bonus). If the
+  pioneer had an expert profession (lumberjack, hunter, fur trapper),
+  those bonuses apply to the gathering rate.
 - At 100 accumulated, the outpost disbands and spawns the original pioneer
   plus a goods cart carrying the harvested yield.
 - If another civ's borders expand over the tile, the outpost auto-disbands
