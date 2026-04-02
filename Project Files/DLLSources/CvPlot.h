@@ -549,6 +549,8 @@ public:
 	void setOutpostYieldType(YieldTypes eYield);
 	PlayerTypes getOutpostOwner() const;
 	void setOutpostOwner(PlayerTypes ePlayer);
+	UnitTypes getOutpostFounderUnitType() const;
+	void setOutpostFounderUnitType(UnitTypes eUnit);
 	void doOutpostTurn();
 	void disbandOutpost(bool bBorderExpansion);
 
@@ -590,6 +592,7 @@ protected:
 	short m_iOutpostYieldStored;
 	YieldTypes m_eOutpostYieldType;
 	PlayerTypes m_eOutpostOwner;
+	UnitTypes m_eOutpostFounderUnitType;
 
 	// Super Forts begin *canal* *choke*
 	int m_iCanalValue;

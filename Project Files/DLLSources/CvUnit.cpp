@@ -8006,6 +8006,7 @@ bool CvUnit::build(BuildTypes eBuild)
 				{
 					pPlot->setOutpostOwner(getOwnerINLINE());
 					pPlot->setOutpostYieldStored(0);
+					pPlot->setOutpostFounderUnitType(getUnitType());
 
 					// Determine which yield to gather from the bonus
 					YieldTypes eBestYield = NO_YIELD;

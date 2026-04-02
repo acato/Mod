@@ -6302,6 +6302,7 @@ void CvPlot::setImprovementType(ImprovementTypes eNewValue)
 			setOutpostYieldStored(0);
 			setOutpostYieldType(NO_YIELD);
 			setOutpostOwner(NO_PLAYER);
+			setOutpostFounderUnitType(NO_UNIT);
 		}
 
 		if (getImprovementType() != NO_IMPROVEMENT)
@@ -10013,6 +10014,16 @@ void CvPlot::setOutpostOwner(PlayerTypes ePlayer)
 	m_eOutpostOwner = ePlayer;
 }
 
+UnitTypes CvPlot::getOutpostFounderUnitType() const
+{
+	return m_eOutpostFounderUnitType;
+}
+
+void CvPlot::setOutpostFounderUnitType(UnitTypes eUnit)
+{
+	m_eOutpostFounderUnitType = eUnit;
+}
+
 void CvPlot::doOutpostTurn()
 {
 	if (getOutpostOwner() == NO_PLAYER)
@@ -10033,8 +10044,27 @@ void CvPlot::doOutpostTurn()
 		return;
 	}
 
-	// Calculate yield as if a free colonist was working this tile (nature yield only)
-	int iYieldGathered = calculateNatureYield(getOutpostYieldType(), GET_PLAYER(getOutpostOwner()).getTeam());
+	// Calculate yield as if the founding unit was working this tile (nature yield + expert bonus)
+	YieldTypes eYield = getOutpostYieldType();
+	int iYieldGathered = calculateNatureYield(eYield, GET_PLAYER(getOutpostOwner()).getTeam());
+
+	// Apply expert bonus from the founding unit (e.g. lumberjack, hunter, fur trapper)
+	UnitTypes eFounder = getOutpostFounderUnitType();
+	if (eFounder != NO_UNIT && iYieldGathered > 0)
+	{
+		if (isValidYieldChanges(eFounder))
+		{
+			iYieldGathered += GC.getUnitInfo(eFounder).getYieldChange(eYield);
+
+			if (eBonus != NO_BONUS)
+			{
+				if (GC.getBonusInfo(eBonus).getYieldChange(eYield) > 0)
+				{
+					iYieldGathered += GC.getUnitInfo(eFounder).getBonusYieldChange(eYield);
+				}
+			}
+		}
+	}
 
 	changeOutpostYieldStored(iYieldGathered);
 
@@ -10055,14 +10085,23 @@ void CvPlot::disbandOutpost(bool bBorderExpansion)
 
 	CvPlayer& kPlayer = GET_PLAYER(eOwner);
 
-	// Spawn pioneer
-	UnitClassTypes ePioneerClass = (UnitClassTypes)GC.getInfoTypeForString("UNITCLASS_PIONEER");
-	if (ePioneerClass != NO_UNITCLASS)
+	// Spawn the founding pioneer (restoring the exact unit type that built the outpost)
+	UnitTypes eFounder = getOutpostFounderUnitType();
+	if (eFounder != NO_UNIT)
 	{
-		UnitTypes ePioneer = (UnitTypes)GC.getCivilizationInfo(kPlayer.getCivilizationType()).getCivilizationUnits(ePioneerClass);
-		if (ePioneer != NO_UNIT)
+		kPlayer.initUnit(eFounder, NO_PROFESSION, coord());
+	}
+	else
+	{
+		// Fallback: spawn generic pioneer
+		UnitClassTypes ePioneerClass = (UnitClassTypes)GC.getInfoTypeForString("UNITCLASS_PIONEER");
+		if (ePioneerClass != NO_UNITCLASS)
 		{
-			kPlayer.initUnit(ePioneer, NO_PROFESSION, coord());
+			UnitTypes ePioneer = (UnitTypes)GC.getCivilizationInfo(kPlayer.getCivilizationType()).getCivilizationUnits(ePioneerClass);
+			if (ePioneer != NO_UNIT)
+			{
+				kPlayer.initUnit(ePioneer, NO_PROFESSION, coord());
+			}
 		}
 	}
 
@@ -10087,6 +10126,7 @@ void CvPlot::disbandOutpost(bool bBorderExpansion)
 	setOutpostYieldStored(0);
 	setOutpostYieldType(NO_YIELD);
 	setOutpostOwner(NO_PLAYER);
+	setOutpostFounderUnitType(NO_UNIT);
 
 	// Remove improvement
 	setImprovementType(NO_IMPROVEMENT);
