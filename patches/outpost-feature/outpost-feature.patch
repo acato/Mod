@@ -1,0 +1,822 @@
+From 74e9170b0daa77e7167e7edece577d52ab1b3eca Mon Sep 17 00:00:00 2001
+From: Alessandro Catorcini <alessandro@catorcini.com>
+Date: Thu, 2 Apr 2026 15:02:16 -0700
+Subject: [PATCH] Add Outpost improvement for frontier resource scavenging
+
+Pioneers can build an outpost on any unowned tile with a scavengeable
+bonus resource (furs, wood). The outpost gathers yield each turn as if
+a free colonist were working the tile. At 100 accumulated, the outpost
+disbands and spawns both the original pioneer and a goods cart carrying
+the harvested yield. Border expansion by another player forces early
+disbandment. Pillaging destroys the outpost without recovering anything.
+
+New XML tags: bScavengeable (CvBonusInfo), bOutpost (CvImprovementInfo)
+New improvement: IMPROVEMENT_OUTPOST
+New build: BUILD_OUTPOST (800 time, 20 gold, consumes pioneer)
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+---
+ Assets/XML/Terrain/CIV4BonusInfos.xml       |  11 ++
+ Assets/XML/Terrain/CIV4ImprovementInfos.xml |  82 ++++++++++
+ Assets/XML/Terrain/CIV4TerrainSchema.xml    |   4 +
+ Assets/XML/Text/CIV4GameText_WTP_utf8.xml   |  24 +++
+ Assets/XML/Units/CIV4BuildInfos.xml         |  21 +++
+ Assets/XML/Units/CIV4UnitInfos.xml          |   4 +
+ Project Files/DLLSources/CvInfos.cpp        |  18 +++
+ Project Files/DLLSources/CvInfos.h          |   4 +
+ Project Files/DLLSources/CvPlot.cpp         | 169 ++++++++++++++++++++
+ Project Files/DLLSources/CvPlot.h           |  16 ++
+ Project Files/DLLSources/CvPlotSavegame.cpp |  30 ++++
+ Project Files/DLLSources/CvUnit.cpp         |  30 ++++
+ 12 files changed, 413 insertions(+)
+
+diff --git a/Assets/XML/Terrain/CIV4BonusInfos.xml b/Assets/XML/Terrain/CIV4BonusInfos.xml
+index f32f94d9..6aa8c361 100644
+--- a/Assets/XML/Terrain/CIV4BonusInfos.xml
++++ b/Assets/XML/Terrain/CIV4BonusInfos.xml
+@@ -174,6 +174,7 @@
+ 					<bFeatureTerrain>1</bFeatureTerrain>
+ 				</FeatureTerrainBoolean>
+ 			</FeatureTerrainBooleans>
++					<bScavengeable>1</bScavengeable>
+ 		</BonusInfo>
+ 		<BonusInfo>
+ 			<Type>BONUS_BOREAL_FOREST</Type>
+@@ -238,6 +239,7 @@
+ 					<bFeatureTerrain>1</bFeatureTerrain>
+ 				</FeatureTerrainBoolean>
+ 			</FeatureTerrainBooleans>
++					<bScavengeable>1</bScavengeable>
+ 		</BonusInfo>
+ 		<BonusInfo>
+ 			<Type>BONUS_GIANT_TREE</Type>
+@@ -302,6 +304,7 @@
+ 					<bFeatureTerrain>1</bFeatureTerrain>
+ 				</FeatureTerrainBoolean>
+ 			</FeatureTerrainBooleans>
++					<bScavengeable>1</bScavengeable>
+ 		</BonusInfo>
+ 		<BonusInfo>
+ 			<Type>BONUS_HARDWOOD</Type>
+@@ -382,6 +385,7 @@
+ 					<bFeatureTerrain>1</bFeatureTerrain>
+ 				</FeatureTerrainBoolean>
+ 			</FeatureTerrainBooleans>
++					<bScavengeable>1</bScavengeable>
+ 		</BonusInfo>
+ 		<BonusInfo>
+ 			<Type>BONUS_IRON</Type>
+@@ -9964,6 +9968,7 @@
+ 				</FeatureBoolean>
+ 			</FeatureBooleans>
+ 			<FeatureTerrainBooleans/>
++					<bScavengeable>1</bScavengeable>
+ 		</BonusInfo>
+ 		<BonusInfo>
+ 			<Type>BONUS_SEALS</Type>
+@@ -10024,6 +10029,7 @@
+ 				</FeatureBoolean>
+ 			</FeatureBooleans>
+ 			<FeatureTerrainBooleans/>
++					<bScavengeable>1</bScavengeable>
+ 		</BonusInfo>
+ 		<BonusInfo>
+ 			<Type>BONUS_WALRUSS</Type>
+@@ -10081,6 +10087,7 @@
+ 				</FeatureBoolean>
+ 			</FeatureBooleans>
+ 			<FeatureTerrainBooleans/>
++					<bScavengeable>1</bScavengeable>
+ 		</BonusInfo>
+ 		<BonusInfo>
+ 			<Type>BONUS_FUR</Type>
+@@ -10217,6 +10224,7 @@
+ 					<bFeatureTerrain>1</bFeatureTerrain>
+ 				</FeatureTerrainBoolean>
+ 			</FeatureTerrainBooleans>
++					<bScavengeable>1</bScavengeable>
+ 		</BonusInfo>
+ 		<BonusInfo>
+ 			<Type>BONUS_SEA_OTTERS</Type>
+@@ -10294,6 +10302,7 @@
+ 					<bFeatureTerrain>1</bFeatureTerrain>
+ 				</FeatureTerrainBoolean>
+ 			</FeatureTerrainBooleans>
++					<bScavengeable>1</bScavengeable>
+ 		</BonusInfo>
+ 		<BonusInfo>
+ 			<Type>BONUS_POLAR_FOX</Type>
+@@ -10440,6 +10449,7 @@
+ 					<bFeatureTerrain>1</bFeatureTerrain>
+ 				</FeatureTerrainBoolean>
+ 			</FeatureTerrainBooleans>
++					<bScavengeable>1</bScavengeable>
+ 		</BonusInfo>
+ 		<BonusInfo>
+ 			<Type>BONUS_RED_FOX</Type>
+@@ -10576,6 +10586,7 @@
+ 					<bFeatureTerrain>1</bFeatureTerrain>
+ 				</FeatureTerrainBoolean>
+ 			</FeatureTerrainBooleans>
++					<bScavengeable>1</bScavengeable>
+ 		</BonusInfo>
+ 		<BonusInfo>
+ 			<Type>BONUS_COTTON</Type>
+diff --git a/Assets/XML/Terrain/CIV4ImprovementInfos.xml b/Assets/XML/Terrain/CIV4ImprovementInfos.xml
+index 400266ab..075fd092 100644
+--- a/Assets/XML/Terrain/CIV4ImprovementInfos.xml
++++ b/Assets/XML/Terrain/CIV4ImprovementInfos.xml
+@@ -6247,6 +6247,88 @@
+ 			<RouteYieldChanges/>
+ 			<bGraphicalOnly>0</bGraphicalOnly>
+ 		</ImprovementInfo>
++		<ImprovementInfo>
++			<Type>IMPROVEMENT_OUTPOST</Type>
++			<Description>TXT_KEY_IMPROVEMENT_OUTPOST</Description>
++			<Civilopedia>TXT_KEY_IMPROVEMENT_OUTPOST_PEDIA</Civilopedia>
++			<ArtDefineTag>ART_DEF_IMPROVEMENT_FORT</ArtDefineTag>
++			<PrereqNatureYields/>
++			<YieldIncreases/>
++			<RiverSideYieldChanges/>
++			<HillsYieldChanges/>
++			<bActsAsCity>0</bActsAsCity>
++			<bOutpost>1</bOutpost>
++			<bHillsMakesValid>1</bHillsMakesValid>
++			<bRiverSideMakesValid>0</bRiverSideMakesValid>
++			<bRequiresFlatlands>0</bRequiresFlatlands>
++			<bRequiresRiverSide>0</bRequiresRiverSide>
++			<bRequiresFeature>0</bRequiresFeature>
++			<bWater>0</bWater>
++			<bGoody>0</bGoody>
++			<bGoodyForSpawningUnits>0</bGoodyForSpawningUnits>
++			<bGoodyForSpawningHostileAnimals>0</bGoodyForSpawningHostileAnimals>
++			<bGoodyForSpawningHostileNatives>0</bGoodyForSpawningHostileNatives>
++			<bGoodyForSpawningHostileCriminals>0</bGoodyForSpawningHostileCriminals>
++			<bPermanent>0</bPermanent>
++			<bUseLSystem>0</bUseLSystem>
++			<iAdvancedStartCost>-1</iAdvancedStartCost>
++			<iAdvancedStartCostIncrease>0</iAdvancedStartCostIncrease>
++			<iTilesPerGoody>0</iTilesPerGoody>
++			<iGoodyRange>0</iGoodyRange>
++			<iFeatureGrowth>0</iFeatureGrowth>
++			<iUpgradeTime>0</iUpgradeTime>
++			<iDefenseModifier>0</iDefenseModifier>
++			<iPillageGold>0</iPillageGold>
++			<bOutsideBorders>1</bOutsideBorders>
++			<TerrainMakesValids>
++				<TerrainMakesValid>
++					<TerrainType>TERRAIN_GRASS</TerrainType>
++					<bMakesValid>1</bMakesValid>
++				</TerrainMakesValid>
++				<TerrainMakesValid>
++					<TerrainType>TERRAIN_WETLAND</TerrainType>
++					<bMakesValid>1</bMakesValid>
++				</TerrainMakesValid>
++				<TerrainMakesValid>
++					<TerrainType>TERRAIN_SAVANNAH</TerrainType>
++					<bMakesValid>1</bMakesValid>
++				</TerrainMakesValid>
++				<TerrainMakesValid>
++					<TerrainType>TERRAIN_PLAINS</TerrainType>
++					<bMakesValid>1</bMakesValid>
++				</TerrainMakesValid>
++				<TerrainMakesValid>
++					<TerrainType>TERRAIN_SHRUBLAND</TerrainType>
++					<bMakesValid>1</bMakesValid>
++				</TerrainMakesValid>
++				<TerrainMakesValid>
++					<TerrainType>TERRAIN_PLAINS_FERTILE</TerrainType>
++					<bMakesValid>1</bMakesValid>
++				</TerrainMakesValid>
++				<TerrainMakesValid>
++					<TerrainType>TERRAIN_MARSH</TerrainType>
++					<bMakesValid>1</bMakesValid>
++				</TerrainMakesValid>
++				<TerrainMakesValid>
++					<TerrainType>TERRAIN_TUNDRA</TerrainType>
++					<bMakesValid>1</bMakesValid>
++				</TerrainMakesValid>
++				<TerrainMakesValid>
++					<TerrainType>TERRAIN_TAIGA</TerrainType>
++					<bMakesValid>1</bMakesValid>
++				</TerrainMakesValid>
++				<TerrainMakesValid>
++					<TerrainType>TERRAIN_SNOW</TerrainType>
++					<bMakesValid>1</bMakesValid>
++				</TerrainMakesValid>
++			</TerrainMakesValids>
++			<FeatureMakesValids/>
++			<BonusTypeStructs/>
++			<ImprovementPillage/>
++			<ImprovementUpgrade/>
++			<RouteYieldChanges/>
++			<bGraphicalOnly>0</bGraphicalOnly>
++		</ImprovementInfo>
+ 		<ImprovementInfo>
+ 			<Type>IMPROVEMENT_FORT</Type>
+ 			<Description>TXT_KEY_IMPROVEMENT_FORT</Description>
+diff --git a/Assets/XML/Terrain/CIV4TerrainSchema.xml b/Assets/XML/Terrain/CIV4TerrainSchema.xml
+index 1f5e1c76..f0a63f1e 100644
+--- a/Assets/XML/Terrain/CIV4TerrainSchema.xml
++++ b/Assets/XML/Terrain/CIV4TerrainSchema.xml
+@@ -309,6 +309,7 @@
+ 	</ElementType>
+ 	<ElementType name="bWhalingboatWorkable" content="textOnly" dt:type="boolean"/>
+ 	<ElementType name="bFishingboatWorkable" content="textOnly" dt:type="boolean"/>
++	<ElementType name="bScavengeable" content="textOnly" dt:type="boolean"/>
+ 	<ElementType name="bUseLSystem" content="textOnly" dt:type="boolean"/>
+ 	<ElementType name="BonusInfo" content="eltOnly">
+ 		<element type="Type"/>
+@@ -348,6 +349,7 @@
+ 		<element type="bUseLSystem" minOccurs="0"/>
+ 		<element type="bWhalingboatWorkable" minOccurs="0"/>
+ 		<element type="bFishingboatWorkable" minOccurs="0"/>
++		<element type="bScavengeable" minOccurs="0"/>
+ 	</ElementType>
+ 	<ElementType name="BonusInfos" content="eltOnly">
+ 		<element type="BonusInfo" maxOccurs="*"/>
+@@ -425,6 +427,7 @@
+ 	<ElementType name="bActsAsCity" content="textOnly" dt:type="boolean"/>
+ 	<ElementType name="bFort" content="textOnly" dt:type="boolean"/>
+ 	<ElementType name="bMonastery" content="textOnly" dt:type="boolean"/>
++	<ElementType name="bOutpost" content="textOnly" dt:type="boolean"/>
+ 	<ElementType name="bCanal" content="textOnly" dt:type="boolean"/>
+ 	<ElementType name="bNotAllowedNextToSameAsItself" content="textOnly" dt:type="boolean"/>
+ 	<ElementType name="bHillsMakesValid" content="textOnly" dt:type="boolean"/>
+@@ -486,6 +489,7 @@
+ 		<element type="bActsAsCity"/>
+ 		<element type="bFort" minOccurs="0"/>
+ 		<element type="bMonastery" minOccurs="0"/>
++		<element type="bOutpost" minOccurs="0"/>
+ 		<element type="bCanal" minOccurs="0"/>
+ 		<element type="bNotAllowedNextToSameAsItself" minOccurs="0"/>
+ 		<element type="bHillsMakesValid"/>
+diff --git a/Assets/XML/Text/CIV4GameText_WTP_utf8.xml b/Assets/XML/Text/CIV4GameText_WTP_utf8.xml
+index d17bdc87..9b3ff0cf 100644
+--- a/Assets/XML/Text/CIV4GameText_WTP_utf8.xml
++++ b/Assets/XML/Text/CIV4GameText_WTP_utf8.xml
+@@ -254,4 +254,28 @@
+ 		<English>Disallow unit from using a direct path</English>
+ 		<Russian>Запретить юниту использовать прямой путь</Russian>
+ 	</TEXT>
++	<TEXT>
++		<Tag>TXT_KEY_BUILD_OUTPOST</Tag>
++		<English>Build Outpost</English>
++	</TEXT>
++	<TEXT>
++		<Tag>TXT_KEY_BUILD_OUTPOST_HELP</Tag>
++		<English>Build an outpost to scavenge resources outside your borders. The pioneer will be restored when the outpost finishes gathering.</English>
++	</TEXT>
++	<TEXT>
++		<Tag>TXT_KEY_IMPROVEMENT_OUTPOST</Tag>
++		<English>Outpost</English>
++	</TEXT>
++	<TEXT>
++		<Tag>TXT_KEY_IMPROVEMENT_OUTPOST_PEDIA</Tag>
++		<English>An outpost is a temporary frontier installation that gathers natural resources from the surrounding wilderness. Once 100 units of goods have been collected, the outpost is dismantled and a goods cart with the harvested resources is produced along with the pioneer who built it.</English>
++	</TEXT>
++	<TEXT>
++		<Tag>TXT_KEY_OUTPOST_COMPLETE</Tag>
++		<English>Our outpost has finished gathering resources!</English>
++	</TEXT>
++	<TEXT>
++		<Tag>TXT_KEY_OUTPOST_BORDER_DISBAND</Tag>
++		<English>Our outpost has been disbanded due to foreign border expansion.</English>
++	</TEXT>
+ </Civ4GameText>
+diff --git a/Assets/XML/Units/CIV4BuildInfos.xml b/Assets/XML/Units/CIV4BuildInfos.xml
+index f435c823..488b407c 100644
+--- a/Assets/XML/Units/CIV4BuildInfos.xml
++++ b/Assets/XML/Units/CIV4BuildInfos.xml
+@@ -3936,6 +3936,27 @@
+ 			<iHotKeyPriority>0</iHotKeyPriority>
+ 			<Button>Art\Interface\Game Hud\Actions\Remove_Rocks_high_res.dds</Button>
+ 		</BuildInfo>
++		<BuildInfo>
++			<Type>BUILD_OUTPOST</Type>
++			<Description>TXT_KEY_BUILD_OUTPOST</Description>
++			<Help>TXT_KEY_BUILD_OUTPOST_HELP</Help>
++			<iTime>800</iTime>
++			<iCost>20</iCost>
++			<bKill>1</bKill>
++			<ImprovementType>IMPROVEMENT_OUTPOST</ImprovementType>
++			<PrereqTerrainType>NONE</PrereqTerrainType>
++			<ResultTerrainType>NONE</ResultTerrainType>
++			<ResultFeatureType>NONE</ResultFeatureType>
++			<RouteType>NONE</RouteType>
++			<EntityEvent>ENTITY_EVENT_BUILD</EntityEvent>
++			<FeatureStructs/>
++			<HotKey/>
++			<bAltDown>0</bAltDown>
++			<bShiftDown>0</bShiftDown>
++			<bCtrlDown>0</bCtrlDown>
++			<iHotKeyPriority>0</iHotKeyPriority>
++			<Button>Art\Interface\Game Hud\Actions\Trapper_House_high_res.dds</Button>
++		</BuildInfo>
+ 		<BuildInfo>
+ 			<Type>BUILD_FORT</Type>
+ 			<Description>TXT_KEY_BUILD_FORT</Description>
+diff --git a/Assets/XML/Units/CIV4UnitInfos.xml b/Assets/XML/Units/CIV4UnitInfos.xml
+index 969dd7ed..0a2cb22a 100644
+--- a/Assets/XML/Units/CIV4UnitInfos.xml
++++ b/Assets/XML/Units/CIV4UnitInfos.xml
+@@ -64093,6 +64093,10 @@
+ 					<BuildType>BUILD_TRAPPER_HUT</BuildType>
+ 					<bBuild>1</bBuild>
+ 				</Build>
++				<Build>
++					<BuildType>BUILD_OUTPOST</BuildType>
++					<bBuild>1</bBuild>
++				</Build>
+ 				<Build>
+ 					<BuildType>BUILD_FORT</BuildType>
+ 					<bBuild>1</bBuild>
+diff --git a/Project Files/DLLSources/CvInfos.cpp b/Project Files/DLLSources/CvInfos.cpp
+index 0dd27618..540d4969 100644
+--- a/Project Files/DLLSources/CvInfos.cpp	
++++ b/Project Files/DLLSources/CvInfos.cpp	
+@@ -8419,6 +8419,7 @@ m_bUpgradeRequiresFortify(false),
+ m_bActsAsCity(true),
+ m_bFort(true), // R&R, ray, Monasteries and Forts
+ m_bMonastery(true), // R&R, ray, Monasteries and Forts
++m_bOutpost(false), // WTP, Outpost feature
+ m_bCanal(true), // WTP, ray, Canal - START
+ m_bNotAllowedNextToSameAsItself(false), // WTP, ray, Not allowed next to itself - START
+ m_bHillsMakesValid(false),
+@@ -8604,6 +8605,11 @@ bool CvImprovementInfo::isMonastery() const
+ 	return m_bMonastery;
+ }
+ // R&R, ray, Monasteries and Forts- END
++// WTP, Outpost feature
++bool CvImprovementInfo::isOutpost() const
++{
++	return m_bOutpost;
++}
+ 
+ // WTP, ray, Canal - START
+ bool CvImprovementInfo::isCanal() const
+@@ -8826,6 +8832,7 @@ void CvImprovementInfo::read(FDataStreamBase* stream)
+ 	stream->Read(&m_bActsAsCity);
+ 	stream->Read(&m_bFort); // R&R, ray, Monasteries and Forts
+ 	stream->Read(&m_bMonastery); // R&R, ray, Monasteries and Forts
++	stream->Read(&m_bOutpost); // WTP, Outpost feature
+ 	stream->Read(&m_bCanal); // WTP, ray, Canal - START
+ 	stream->Read(&m_bNotAllowedNextToSameAsItself);// WTP, ray, Not allowed next to itself - START
+ 	stream->Read(&m_bHillsMakesValid);
+@@ -8913,6 +8920,7 @@ void CvImprovementInfo::write(FDataStreamBase* stream)
+ 	stream->Write(m_bActsAsCity);
+ 	stream->Write(m_bFort); // R&R, ray, Monasteries and Forts
+ 	stream->Write(m_bMonastery); // R&R, ray, Monasteries and Forts
++	stream->Write(m_bOutpost); // WTP, Outpost feature
+ 	stream->Write(m_bCanal); // WTP, ray, Canal - START
+ 	stream->Write(m_bNotAllowedNextToSameAsItself);// WTP, ray, Not allowed next to itself - START
+ 	stream->Write(m_bHillsMakesValid);
+@@ -8967,6 +8975,7 @@ bool CvImprovementInfo::read(CvXMLLoadUtility* pXML)
+ 	pXML->GetChildXmlValByName(&m_bActsAsCity, "bActsAsCity");
+ 	pXML->GetChildXmlValByName(&m_bFort, "bFort"); // R&R, ray, Monasteries and Forts
+ 	pXML->GetChildXmlValByName(&m_bMonastery, "bMonastery"); // R&R, ray, Monasteries and Forts
++	pXML->GetChildXmlValByName(&m_bOutpost, "bOutpost"); // WTP, Outpost feature
+ 	pXML->GetChildXmlValByName(&m_bCanal, "bCanal"); // WTP, ray, Canal - START
+ 	pXML->GetChildXmlValByName(&m_bNotAllowedNextToSameAsItself, "bNotAllowedNextToSameAsItself"); // WTP, ray, Not allowed next to itself - START
+ 	pXML->GetChildXmlValByName(&m_bHillsMakesValid, "bHillsMakesValid");
+@@ -9110,6 +9119,7 @@ m_bOnlyNorthernHemisphere(false), //ray, Norther and Southern Hemisphere, using
+ m_bUseLSystem(false),
+ m_bWhalingboatWorkable(false), //TAC Whaling, ray
+ m_bFishingboatWorkable(false), // R&R, ray, High Sea Fishing
++m_bScavengeable(false), // WTP, Outpost feature
+ m_aiYieldChange(NULL),
+ m_aiImprovementChange(NULL),
+ m_abTerrain(NULL),
+@@ -9275,6 +9285,11 @@ bool CvBonusInfo::isFishingboatWorkable() const
+ 	return m_bFishingboatWorkable;
+ }
+ // R&R, ray, High Sea Fishing - END
++// WTP, Outpost feature
++bool CvBonusInfo::isScavengeable() const
++{
++	return m_bScavengeable;
++}
+ 
+ bool CvBonusInfo::useLSystem() const
+ {
+@@ -9406,6 +9421,7 @@ void CvBonusInfo::read(FDataStreamBase* stream)
+ 	stream->Read(&m_bOnlyNorthernHemisphere); //ray, Norther and Southern Hemisphere, using hint of f1rpo
+ 	stream->Read(&m_bWhalingboatWorkable); //TAC Whaling, ray
+ 	stream->Read(&m_bFishingboatWorkable); //TAC Whaling, ray
++	stream->Read(&m_bScavengeable); // WTP, Outpost feature
+ 	stream->Read(&m_bUseLSystem);
+ 	stream->ReadString(m_szArtDefineTag);
+ 	// Arrays
+@@ -9461,6 +9477,7 @@ void CvBonusInfo::write(FDataStreamBase* stream)
+ 	stream->Write(m_bOnlyNorthernHemisphere); //ray, Norther and Southern Hemisphere, using hint of f1rpo
+ 	stream->Write(m_bWhalingboatWorkable); //TAC Whaling, ray
+ 	stream->Write(m_bFishingboatWorkable); // R&R, ray, High Sea Fishing
++	stream->Write(m_bScavengeable); // WTP, Outpost feature
+ 	stream->Write(m_bUseLSystem);
+ 	stream->WriteString(m_szArtDefineTag);
+ 	// Arrays
+@@ -9517,6 +9534,7 @@ bool CvBonusInfo::read(CvXMLLoadUtility* pXML)
+ 	pXML->GetChildXmlValByName(&m_bOnlyNorthernHemisphere, "bOnlyNorthernHemisphere"); //ray, Norther and Southern Hemisphere, using hint of f1rpo
+ 	pXML->GetChildXmlValByName(&m_bWhalingboatWorkable, "bWhalingboatWorkable"); //TAC Whaling, ray
+ 	pXML->GetChildXmlValByName(&m_bFishingboatWorkable, "bFishingboatWorkable"); // R&R, ray, High Sea Fishing
++	pXML->GetChildXmlValByName(&m_bScavengeable, "bScavengeable"); // WTP, Outpost feature
+ 	pXML->GetChildXmlValByName(&m_bUseLSystem, "bUseLSystem");
+ 	pXML->SetVariableListTagPair(&m_abTerrain, "TerrainBooleans", GC.getNumTerrainInfos(), false);
+ 	pXML->SetVariableListTagPair(&m_abFeature, "FeatureBooleans", GC.getNumFeatureInfos(), false);
+diff --git a/Project Files/DLLSources/CvInfos.h b/Project Files/DLLSources/CvInfos.h
+index 67f3d943..abfb403c 100644
+--- a/Project Files/DLLSources/CvInfos.h	
++++ b/Project Files/DLLSources/CvInfos.h	
+@@ -2455,6 +2455,7 @@ public:
+ 	bool isActsAsCity() const;
+ 	bool isFort() const; // R&R, ray, Monasteries and Forts
+ 	bool isMonastery() const; // R&R, ray, Monasteries and Forts
++	bool isOutpost() const; // WTP, Outpost feature
+ 	bool isCanal() const; // WTP, ray, Canal
+ 	bool isNotAllowedNextToSameAsItself() const; // WTP, ray, Not allowed next to itself - START
+ 	bool isHillsMakesValid() const;
+@@ -2533,6 +2534,7 @@ protected:
+ 	bool m_bActsAsCity;
+ 	bool m_bFort; // R&R, ray, Monasteries and Forts
+ 	bool m_bMonastery; // R&R, ray, Monasteries and Forts
++	bool m_bOutpost; // WTP, Outpost feature
+ 	bool m_bCanal; // WTP, ray, Canal - START
+ 	bool m_bNotAllowedNextToSameAsItself; // WTP, ray, Not allowed next to itself - START
+ 	bool m_bHillsMakesValid;
+@@ -2608,6 +2610,7 @@ public:
+ 	bool isWhalingboatWorkable() const;
+ 	//End TAC Whaling, ray
+ 	bool isFishingboatWorkable() const; // R&R, ray, High Sea Fishing
++	bool isScavengeable() const; // WTP, Outpost feature
+ 	bool isFlatlands() const;
+ 	bool isNoRiverSide() const;
+ 	bool isRiverSideOnly() const; // Ray, adding 2 more XML tags to control bonus placement
+@@ -2671,6 +2674,7 @@ protected:
+ 	bool m_bUseLSystem;
+ 	bool m_bWhalingboatWorkable; //TAC Whaling, ray
+ 	bool m_bFishingboatWorkable; // R&R, ray, High Sea Fishing
++	bool m_bScavengeable; // WTP, Outpost feature
+ 	CvString m_szArtDefineTag;
+ 	// Arrays
+ 	int* m_aiYieldChange;
+diff --git a/Project Files/DLLSources/CvPlot.cpp b/Project Files/DLLSources/CvPlot.cpp
+index 5f7ea193..7d1e0180 100644
+--- a/Project Files/DLLSources/CvPlot.cpp	
++++ b/Project Files/DLLSources/CvPlot.cpp	
+@@ -311,6 +311,12 @@ void CvPlot::doTurn()
+ 		doImprovementUpgrade();
+ 	}
+ 
++	// WTP, Outpost feature - gather resources each turn
++	if (getImprovementType() != NO_IMPROVEMENT && getOutpostOwner() != NO_PLAYER)
++	{
++		doOutpostTurn();
++	}
++
+ 	//WTP, Protected Hostile Goodies - START
+ 	if (isGoodyForSpawningHostileAnimals())
+ 	{
+@@ -2327,6 +2333,24 @@ bool CvPlot::canBuild(BuildTypes eBuild, PlayerTypes ePlayer, bool bTestVisible)
+ 			return false;
+ 		}
+ 
++		// WTP, Outpost feature - outpost requires scavengeable bonus on unowned tile with no existing improvement
++		if (GC.getImprovementInfo(eImprovement).isOutpost())
++		{
++			if (isOwned())
++			{
++				return false;
++			}
++			if (getImprovementType() != NO_IMPROVEMENT)
++			{
++				return false;
++			}
++			BonusTypes eBonus = getBonusType();
++			if (eBonus == NO_BONUS || !GC.getBonusInfo(eBonus).isScavengeable())
++			{
++				return false;
++			}
++		}
++
+ 		// Super Forts begin *build*
+ 		if (GC.getImprovementInfo(eImprovement).getUniqueRange() > 0)
+ 		{
+@@ -5585,6 +5609,12 @@ void CvPlot::setOwner(PlayerTypes eNewValue, bool bCheckUnits)
+ 			}
+ 		}
+ 
++		// WTP, Outpost feature - disband outpost if another player claims the tile
++		if (getOutpostOwner() != NO_PLAYER && eNewValue != NO_PLAYER && eNewValue != getOutpostOwner())
++		{
++			disbandOutpost(true);
++		}
++
+ 		m_eOwner = eNewValue;
+ 
+ 		setWorkingCityOverride(NULL);
+@@ -6263,6 +6293,17 @@ void CvPlot::setImprovementType(ImprovementTypes eNewValue)
+ 
+ 	if (getImprovementType() != eNewValue)
+ 	{
++		// WTP, Outpost feature - if outpost is being removed externally (e.g. pillaged),
++		// clear outpost state without spawning units
++		if (getOutpostOwner() != NO_PLAYER && eOldImprovement != NO_IMPROVEMENT)
++		{
++			// Only clear if this is NOT being called from disbandOutpost itself
++			// disbandOutpost sets owner to NO_PLAYER before calling setImprovementType
++			setOutpostYieldStored(0);
++			setOutpostYieldType(NO_YIELD);
++			setOutpostOwner(NO_PLAYER);
++		}
++
+ 		if (getImprovementType() != NO_IMPROVEMENT)
+ 		{
+ 			if (area())
+@@ -9936,6 +9977,134 @@ void CvPlot::addCrumbs(int iQuantity)
+ 	m_iCrumbs = std::min(MAX_SHORT, m_iCrumbs + iQuantity);
+ }
+ 
++// WTP, Outpost feature - START
++int CvPlot::getOutpostYieldStored() const
++{
++	return m_iOutpostYieldStored;
++}
++
++void CvPlot::setOutpostYieldStored(int iNewValue)
++{
++	m_iOutpostYieldStored = (short)iNewValue;
++}
++
++void CvPlot::changeOutpostYieldStored(int iChange)
++{
++	setOutpostYieldStored(getOutpostYieldStored() + iChange);
++}
++
++YieldTypes CvPlot::getOutpostYieldType() const
++{
++	return m_eOutpostYieldType;
++}
++
++void CvPlot::setOutpostYieldType(YieldTypes eYield)
++{
++	m_eOutpostYieldType = eYield;
++}
++
++PlayerTypes CvPlot::getOutpostOwner() const
++{
++	return m_eOutpostOwner;
++}
++
++void CvPlot::setOutpostOwner(PlayerTypes ePlayer)
++{
++	m_eOutpostOwner = ePlayer;
++}
++
++void CvPlot::doOutpostTurn()
++{
++	if (getOutpostOwner() == NO_PLAYER)
++	{
++		return;
++	}
++
++	if (getOutpostYieldType() == NO_YIELD)
++	{
++		return;
++	}
++
++	BonusTypes eBonus = getBonusType();
++	if (eBonus == NO_BONUS || !GC.getBonusInfo(eBonus).isScavengeable())
++	{
++		// bonus was removed or is no longer scavengeable - force disband
++		disbandOutpost(false);
++		return;
++	}
++
++	// Calculate yield as if a free colonist was working this tile (nature yield only)
++	int iYieldGathered = calculateNatureYield(getOutpostYieldType(), GET_PLAYER(getOutpostOwner()).getTeam());
++
++	changeOutpostYieldStored(iYieldGathered);
++
++	if (getOutpostYieldStored() >= 100)
++	{
++		setOutpostYieldStored(100);
++		disbandOutpost(false);
++	}
++}
++
++void CvPlot::disbandOutpost(bool bBorderExpansion)
++{
++	PlayerTypes eOwner = getOutpostOwner();
++	if (eOwner == NO_PLAYER)
++	{
++		return;
++	}
++
++	CvPlayer& kPlayer = GET_PLAYER(eOwner);
++
++	// Spawn pioneer
++	UnitClassTypes ePioneerClass = (UnitClassTypes)GC.getInfoTypeForString("UNITCLASS_PIONEER");
++	if (ePioneerClass != NO_UNITCLASS)
++	{
++		UnitTypes ePioneer = (UnitTypes)GC.getCivilizationInfo(kPlayer.getCivilizationType()).getCivilizationUnits(ePioneerClass);
++		if (ePioneer != NO_UNIT)
++		{
++			kPlayer.initUnit(ePioneer, NO_PROFESSION, coord());
++		}
++	}
++
++	// Spawn yield unit (goods cart) with accumulated goods
++	int iYield = getOutpostYieldStored();
++	if (iYield > 0)
++	{
++		YieldTypes eYield = getOutpostYieldType();
++		UnitClassTypes eUnitClass = (UnitClassTypes)GC.getYieldInfo(eYield).getUnitClass();
++		if (eUnitClass != NO_UNITCLASS)
++		{
++			UnitTypes eYieldUnit = (UnitTypes)GC.getCivilizationInfo(kPlayer.getCivilizationType()).getCivilizationUnits(eUnitClass);
++			if (eYieldUnit != NO_UNIT)
++			{
++				kPlayer.initUnit(eYieldUnit, NO_PROFESSION, coord(), NO_UNITAI, NO_DIRECTION, iYield);
++			}
++		}
++	}
++
++	// Reset outpost state before removing improvement
++	// (setImprovementType checks outpost owner to handle pillaging)
++	setOutpostYieldStored(0);
++	setOutpostYieldType(NO_YIELD);
++	setOutpostOwner(NO_PLAYER);
++
++	// Remove improvement
++	setImprovementType(NO_IMPROVEMENT);
++
++	// Notify player
++	CvWString szBuffer;
++	if (bBorderExpansion)
++	{
++		szBuffer = gDLL->getText("TXT_KEY_OUTPOST_BORDER_DISBAND");
++	}
++	else
++	{
++		szBuffer = gDLL->getText("TXT_KEY_OUTPOST_COMPLETE");
++	}
++	gDLL->UI().addPlayerMessage(eOwner, false, GC.getEVENT_MESSAGE_TIME(), szBuffer, "AS2D_DISCOVERBONUS", MESSAGE_TYPE_MINOR_EVENT, NULL, COLOR_WHITE, getX_INLINE(), getY_INLINE(), true, true);
++}
++// WTP, Outpost feature - END
++
+ const char* CvPlot::getResourceLayerIcon(ResourceLayerOptions eOption, CvWStringBuffer& szHelp, PlotIndicatorVisibilityFlags& eVisibilityFlag, ColorTypes& eColor) const
+ {
+ 	const char* szIcon = NULL;
+diff --git a/Project Files/DLLSources/CvPlot.h b/Project Files/DLLSources/CvPlot.h
+index a8a5decf..d4ffd837 100644
+--- a/Project Files/DLLSources/CvPlot.h	
++++ b/Project Files/DLLSources/CvPlot.h	
+@@ -541,6 +541,17 @@ public:
+ 	int getCrumbs() const;
+ 	void addCrumbs(int iQuantity);
+ 
++	// WTP, Outpost feature
++	int getOutpostYieldStored() const;
++	void setOutpostYieldStored(int iNewValue);
++	void changeOutpostYieldStored(int iChange);
++	YieldTypes getOutpostYieldType() const;
++	void setOutpostYieldType(YieldTypes eYield);
++	PlayerTypes getOutpostOwner() const;
++	void setOutpostOwner(PlayerTypes ePlayer);
++	void doOutpostTurn();
++	void disbandOutpost(bool bBorderExpansion);
++
+ 	DllExport const char* getResourceLayerIcon(ResourceLayerOptions eOption, CvWStringBuffer& szHelp, PlotIndicatorVisibilityFlags& eVisibilityFlag, ColorTypes& eColor) const;
+ 	DllExport CvUnit* getUnitLayerUnit(UnitLayerOptionTypes eOption, CvWStringBuffer& szHelp, PlotIndicatorVisibilityFlags& eVisibilityFlag, ColorTypes& eColor, bool& bTestEnemyVisibility) const;
+ 
+@@ -575,6 +586,11 @@ protected:
+ 	short m_iRiverCrossingCount;
+ 	short m_iDistanceToOcean;
+ 	short m_iCrumbs;
++	// WTP, Outpost feature
++	short m_iOutpostYieldStored;
++	YieldTypes m_eOutpostYieldType;
++	PlayerTypes m_eOutpostOwner;
++
+ 	// Super Forts begin *canal* *choke*
+ 	int m_iCanalValue;
+ 	int m_iChokeValue;
+diff --git a/Project Files/DLLSources/CvPlotSavegame.cpp b/Project Files/DLLSources/CvPlotSavegame.cpp
+index f95f55a3..ebc331af 100644
+--- a/Project Files/DLLSources/CvPlotSavegame.cpp	
++++ b/Project Files/DLLSources/CvPlotSavegame.cpp	
+@@ -43,6 +43,11 @@ const EuropeTypes defaulteEurope = NO_EUROPE;
+ 
+ const byte defaulteRiverCrossing = 0;
+ 
++// WTP, Outpost feature
++const short defaultOutpostYieldStored = 0;
++const YieldTypes defaultOutpostYieldType = NO_YIELD;
++const PlayerTypes defaultOutpostOwner = NO_PLAYER;
++
+ 
+ enum SavegameVariableTypes
+ {
+@@ -111,6 +116,11 @@ enum SavegameVariableTypes
+ 
+ 	Save_Units,
+ 
++	// WTP, Outpost feature
++	Save_OutpostYieldStored,
++	Save_OutpostYieldType,
++	Save_OutpostOwner,
++
+ 	NUM_SAVE_ENUM_VALUES,
+ };
+ 
+@@ -187,6 +197,11 @@ const char* getSavedEnumNamePlot(SavegameVariableTypes eType)
+ 	case Save_BuildProgress: return "Save_BuildProgress";
+ 
+ 	case Save_Units: return "Save_Units";
++
++	// WTP, Outpost feature
++	case Save_OutpostYieldStored: return "Save_OutpostYieldStored";
++	case Save_OutpostYieldType: return "Save_OutpostYieldType";
++	case Save_OutpostOwner: return "Save_OutpostOwner";
+ 	}
+ 	FAssertMsg(0, "Missing case");
+ 	return "";
+@@ -242,6 +257,11 @@ void CvPlot::resetSavedData()
+ 	m_workingCity.reset();
+ 	m_workingCityOverride.reset();
+ 
++	// WTP, Outpost feature
++	m_iOutpostYieldStored = defaultOutpostYieldStored;
++	m_eOutpostYieldType = defaultOutpostYieldType;
++	m_eOutpostOwner = defaultOutpostOwner;
++
+ 	m_em_bRevealed.reset();
+ 	m_aeRevealedImprovementRouteTypes.reset();
+ }
+@@ -370,6 +390,11 @@ void CvPlot::read(CvSavegameReader reader)
+ 
+ 		case Save_Units                    : reader.Read(m_units)                             ; break;
+ 
++		// WTP, Outpost feature
++		case Save_OutpostYieldStored       : reader.Read(m_iOutpostYieldStored)               ; break;
++		case Save_OutpostYieldType         : m_eOutpostYieldType  = reader.ReadBitfield(m_eOutpostYieldType) ; break;
++		case Save_OutpostOwner             : m_eOutpostOwner      = reader.ReadBitfield(m_eOutpostOwner)     ; break;
++
+ 		default:
+ 			FAssertMsg(false, "Unhandled savegame enum");
+ 			break;
+@@ -510,5 +535,10 @@ void CvPlot::write(CvSavegameWriter writer)
+ 
+ 	writer.Write(Save_Units, m_units);
+ 
++	// WTP, Outpost feature
++	writer.Write(Save_OutpostYieldStored, m_iOutpostYieldStored, defaultOutpostYieldStored);
++	writer.Write(Save_OutpostYieldType, m_eOutpostYieldType, defaultOutpostYieldType);
++	writer.Write(Save_OutpostOwner, m_eOutpostOwner, defaultOutpostOwner);
++
+ 	writer.Write(Save_END);
+ }
+diff --git a/Project Files/DLLSources/CvUnit.cpp b/Project Files/DLLSources/CvUnit.cpp
+index a93885f9..eb8b3f91 100644
+--- a/Project Files/DLLSources/CvUnit.cpp	
++++ b/Project Files/DLLSources/CvUnit.cpp	
+@@ -7994,6 +7994,36 @@ bool CvUnit::build(BuildTypes eBuild)
+ 			}
+ 		}
+ 		// Super Forts end
++
++		// WTP, Outpost feature - initialize outpost state when build completes
++		if (GC.getBuildInfo(eBuild).getImprovement() != NO_IMPROVEMENT)
++		{
++			if (GC.getImprovementInfo((ImprovementTypes)GC.getBuildInfo(eBuild).getImprovement()).isOutpost())
++			{
++				CvPlot* pPlot = plot();
++				BonusTypes eBonus = pPlot->getBonusType();
++				if (eBonus != NO_BONUS)
++				{
++					pPlot->setOutpostOwner(getOwnerINLINE());
++					pPlot->setOutpostYieldStored(0);
++
++					// Determine which yield to gather from the bonus
++					YieldTypes eBestYield = NO_YIELD;
++					int iBestValue = 0;
++					for (int iYield = 0; iYield < NUM_YIELD_TYPES; ++iYield)
++					{
++						int iValue = GC.getBonusInfo(eBonus).getYieldChange(iYield);
++						if (iValue > iBestValue)
++						{
++							iBestValue = iValue;
++							eBestYield = (YieldTypes)iYield;
++						}
++					}
++					pPlot->setOutpostYieldType(eBestYield);
++				}
++			}
++		}
++
+ 		if (GC.getBuildInfo(eBuild).isKill())
+ 		{
+ 			kill(true);
+-- 
+2.53.0.windows.2
+
