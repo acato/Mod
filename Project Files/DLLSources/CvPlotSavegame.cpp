@@ -43,6 +43,11 @@ const EuropeTypes defaulteEurope = NO_EUROPE;
 
 const byte defaulteRiverCrossing = 0;
 
+// WTP, Outpost feature
+const short defaultOutpostYieldStored = 0;
+const YieldTypes defaultOutpostYieldType = NO_YIELD;
+const PlayerTypes defaultOutpostOwner = NO_PLAYER;
+
 
 enum SavegameVariableTypes
 {
@@ -110,6 +115,11 @@ enum SavegameVariableTypes
 	Save_BuildProgress,
 
 	Save_Units,
+
+	// WTP, Outpost feature
+	Save_OutpostYieldStored,
+	Save_OutpostYieldType,
+	Save_OutpostOwner,
 
 	NUM_SAVE_ENUM_VALUES,
 };
@@ -187,6 +197,11 @@ const char* getSavedEnumNamePlot(SavegameVariableTypes eType)
 	case Save_BuildProgress: return "Save_BuildProgress";
 
 	case Save_Units: return "Save_Units";
+
+	// WTP, Outpost feature
+	case Save_OutpostYieldStored: return "Save_OutpostYieldStored";
+	case Save_OutpostYieldType: return "Save_OutpostYieldType";
+	case Save_OutpostOwner: return "Save_OutpostOwner";
 	}
 	FAssertMsg(0, "Missing case");
 	return "";
@@ -241,6 +256,11 @@ void CvPlot::resetSavedData()
 	m_plotCity.reset();
 	m_workingCity.reset();
 	m_workingCityOverride.reset();
+
+	// WTP, Outpost feature
+	m_iOutpostYieldStored = defaultOutpostYieldStored;
+	m_eOutpostYieldType = defaultOutpostYieldType;
+	m_eOutpostOwner = defaultOutpostOwner;
 
 	m_em_bRevealed.reset();
 	m_aeRevealedImprovementRouteTypes.reset();
@@ -369,6 +389,11 @@ void CvPlot::read(CvSavegameReader reader)
 		case Save_BuildProgress            : reader.Read(m_em_iBuildProgress)                 ; break;
 
 		case Save_Units                    : reader.Read(m_units)                             ; break;
+
+		// WTP, Outpost feature
+		case Save_OutpostYieldStored       : reader.Read(m_iOutpostYieldStored)               ; break;
+		case Save_OutpostYieldType         : m_eOutpostYieldType  = reader.ReadBitfield(m_eOutpostYieldType) ; break;
+		case Save_OutpostOwner             : m_eOutpostOwner      = reader.ReadBitfield(m_eOutpostOwner)     ; break;
 
 		default:
 			FAssertMsg(false, "Unhandled savegame enum");
@@ -509,6 +534,11 @@ void CvPlot::write(CvSavegameWriter writer)
 	writer.Write(Save_BuildProgress, m_em_iBuildProgress);
 
 	writer.Write(Save_Units, m_units);
+
+	// WTP, Outpost feature
+	writer.Write(Save_OutpostYieldStored, m_iOutpostYieldStored, defaultOutpostYieldStored);
+	writer.Write(Save_OutpostYieldType, m_eOutpostYieldType, defaultOutpostYieldType);
+	writer.Write(Save_OutpostOwner, m_eOutpostOwner, defaultOutpostOwner);
 
 	writer.Write(Save_END);
 }

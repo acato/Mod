@@ -3937,6 +3937,27 @@
 			<Button>Art\Interface\Game Hud\Actions\Remove_Rocks_high_res.dds</Button>
 		</BuildInfo>
 		<BuildInfo>
+			<Type>BUILD_OUTPOST</Type>
+			<Description>TXT_KEY_BUILD_OUTPOST</Description>
+			<Help>TXT_KEY_BUILD_OUTPOST_HELP</Help>
+			<iTime>800</iTime>
+			<iCost>20</iCost>
+			<bKill>1</bKill>
+			<ImprovementType>IMPROVEMENT_OUTPOST</ImprovementType>
+			<PrereqTerrainType>NONE</PrereqTerrainType>
+			<ResultTerrainType>NONE</ResultTerrainType>
+			<ResultFeatureType>NONE</ResultFeatureType>
+			<RouteType>NONE</RouteType>
+			<EntityEvent>ENTITY_EVENT_BUILD</EntityEvent>
+			<FeatureStructs/>
+			<HotKey/>
+			<bAltDown>0</bAltDown>
+			<bShiftDown>0</bShiftDown>
+			<bCtrlDown>0</bCtrlDown>
+			<iHotKeyPriority>0</iHotKeyPriority>
+			<Button>Art\Interface\Game Hud\Actions\Trapper_House_high_res.dds</Button>
+		</BuildInfo>
+		<BuildInfo>
 			<Type>BUILD_FORT</Type>
 			<Description>TXT_KEY_BUILD_FORT</Description>
 			<Help>TXT_KEY_BUILD_FORT_HELP</Help>

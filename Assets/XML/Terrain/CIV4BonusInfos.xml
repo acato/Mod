@@ -174,6 +174,7 @@
 					<bFeatureTerrain>1</bFeatureTerrain>
 				</FeatureTerrainBoolean>
 			</FeatureTerrainBooleans>
+					<bScavengeable>1</bScavengeable>
 		</BonusInfo>
 		<BonusInfo>
 			<Type>BONUS_BOREAL_FOREST</Type>
@@ -238,6 +239,7 @@
 					<bFeatureTerrain>1</bFeatureTerrain>
 				</FeatureTerrainBoolean>
 			</FeatureTerrainBooleans>
+					<bScavengeable>1</bScavengeable>
 		</BonusInfo>
 		<BonusInfo>
 			<Type>BONUS_GIANT_TREE</Type>
@@ -302,6 +304,7 @@
 					<bFeatureTerrain>1</bFeatureTerrain>
 				</FeatureTerrainBoolean>
 			</FeatureTerrainBooleans>
+					<bScavengeable>1</bScavengeable>
 		</BonusInfo>
 		<BonusInfo>
 			<Type>BONUS_HARDWOOD</Type>
@@ -382,6 +385,7 @@
 					<bFeatureTerrain>1</bFeatureTerrain>
 				</FeatureTerrainBoolean>
 			</FeatureTerrainBooleans>
+					<bScavengeable>1</bScavengeable>
 		</BonusInfo>
 		<BonusInfo>
 			<Type>BONUS_IRON</Type>
@@ -9964,6 +9968,7 @@
 				</FeatureBoolean>
 			</FeatureBooleans>
 			<FeatureTerrainBooleans/>
+					<bScavengeable>1</bScavengeable>
 		</BonusInfo>
 		<BonusInfo>
 			<Type>BONUS_SEALS</Type>
@@ -10024,6 +10029,7 @@
 				</FeatureBoolean>
 			</FeatureBooleans>
 			<FeatureTerrainBooleans/>
+					<bScavengeable>1</bScavengeable>
 		</BonusInfo>
 		<BonusInfo>
 			<Type>BONUS_WALRUSS</Type>
@@ -10081,6 +10087,7 @@
 				</FeatureBoolean>
 			</FeatureBooleans>
 			<FeatureTerrainBooleans/>
+					<bScavengeable>1</bScavengeable>
 		</BonusInfo>
 		<BonusInfo>
 			<Type>BONUS_FUR</Type>
@@ -10217,6 +10224,7 @@
 					<bFeatureTerrain>1</bFeatureTerrain>
 				</FeatureTerrainBoolean>
 			</FeatureTerrainBooleans>
+					<bScavengeable>1</bScavengeable>
 		</BonusInfo>
 		<BonusInfo>
 			<Type>BONUS_SEA_OTTERS</Type>
@@ -10294,6 +10302,7 @@
 					<bFeatureTerrain>1</bFeatureTerrain>
 				</FeatureTerrainBoolean>
 			</FeatureTerrainBooleans>
+					<bScavengeable>1</bScavengeable>
 		</BonusInfo>
 		<BonusInfo>
 			<Type>BONUS_POLAR_FOX</Type>
@@ -10440,6 +10449,7 @@
 					<bFeatureTerrain>1</bFeatureTerrain>
 				</FeatureTerrainBoolean>
 			</FeatureTerrainBooleans>
+					<bScavengeable>1</bScavengeable>
 		</BonusInfo>
 		<BonusInfo>
 			<Type>BONUS_RED_FOX</Type>
@@ -10576,6 +10586,7 @@
 					<bFeatureTerrain>1</bFeatureTerrain>
 				</FeatureTerrainBoolean>
 			</FeatureTerrainBooleans>
+					<bScavengeable>1</bScavengeable>
 		</BonusInfo>
 		<BonusInfo>
 			<Type>BONUS_COTTON</Type>
