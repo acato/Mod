@@ -8029,6 +8029,36 @@ bool CvUnit::build(BuildTypes eBuild)
 			}
 		}
 		// Super Forts end
+
+		// WTP, Outpost feature - initialize outpost state when build completes
+		if (GC.getBuildInfo(eBuild).getImprovement() != NO_IMPROVEMENT)
+		{
+			if (GC.getImprovementInfo((ImprovementTypes)GC.getBuildInfo(eBuild).getImprovement()).isOutpost())
+			{
+				CvPlot* pPlot = plot();
+				BonusTypes eBonus = pPlot->getBonusType();
+				if (eBonus != NO_BONUS)
+				{
+					pPlot->setOutpostOwner(getOwnerINLINE());
+					pPlot->setOutpostYieldStored(0);
+
+					// Determine which yield to gather from the bonus
+					YieldTypes eBestYield = NO_YIELD;
+					int iBestValue = 0;
+					for (int iYield = 0; iYield < NUM_YIELD_TYPES; ++iYield)
+					{
+						int iValue = GC.getBonusInfo(eBonus).getYieldChange(iYield);
+						if (iValue > iBestValue)
+						{
+							iBestValue = iValue;
+							eBestYield = (YieldTypes)iYield;
+						}
+					}
+					pPlot->setOutpostYieldType(eBestYield);
+				}
+			}
+		}
+
 		if (GC.getBuildInfo(eBuild).isKill())
 		{
 			kill(true);

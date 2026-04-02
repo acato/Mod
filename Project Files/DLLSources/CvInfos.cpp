@@ -8419,6 +8419,7 @@ m_bUpgradeRequiresFortify(false),
 m_bActsAsCity(true),
 m_bFort(true), // R&R, ray, Monasteries and Forts
 m_bMonastery(true), // R&R, ray, Monasteries and Forts
+m_bOutpost(false), // WTP, Outpost feature
 m_bCanal(true), // WTP, ray, Canal - START
 m_bDeepCanal(false),
 m_bNotAllowedNextToSameAsItself(false), // WTP, ray, Not allowed next to itself - START
@@ -8605,6 +8606,11 @@ bool CvImprovementInfo::isMonastery() const
 	return m_bMonastery;
 }
 // R&R, ray, Monasteries and Forts- END
+// WTP, Outpost feature
+bool CvImprovementInfo::isOutpost() const
+{
+	return m_bOutpost;
+}
 
 // WTP, ray, Canal - START
 bool CvImprovementInfo::isCanal() const
@@ -8832,6 +8838,7 @@ void CvImprovementInfo::read(FDataStreamBase* stream)
 	stream->Read(&m_bActsAsCity);
 	stream->Read(&m_bFort); // R&R, ray, Monasteries and Forts
 	stream->Read(&m_bMonastery); // R&R, ray, Monasteries and Forts
+	stream->Read(&m_bOutpost); // WTP, Outpost feature
 	stream->Read(&m_bCanal); // WTP, ray, Canal - START
 	stream->Read(&m_bDeepCanal);
 	stream->Read(&m_bNotAllowedNextToSameAsItself);// WTP, ray, Not allowed next to itself - START
@@ -8920,6 +8927,7 @@ void CvImprovementInfo::write(FDataStreamBase* stream)
 	stream->Write(m_bActsAsCity);
 	stream->Write(m_bFort); // R&R, ray, Monasteries and Forts
 	stream->Write(m_bMonastery); // R&R, ray, Monasteries and Forts
+	stream->Write(m_bOutpost); // WTP, Outpost feature
 	stream->Write(m_bCanal); // WTP, ray, Canal - START
 	stream->Write(m_bDeepCanal);
 	stream->Write(m_bNotAllowedNextToSameAsItself);// WTP, ray, Not allowed next to itself - START
@@ -8975,6 +8983,7 @@ bool CvImprovementInfo::read(CvXMLLoadUtility* pXML)
 	pXML->GetChildXmlValByName(&m_bActsAsCity, "bActsAsCity");
 	pXML->GetChildXmlValByName(&m_bFort, "bFort"); // R&R, ray, Monasteries and Forts
 	pXML->GetChildXmlValByName(&m_bMonastery, "bMonastery"); // R&R, ray, Monasteries and Forts
+	pXML->GetChildXmlValByName(&m_bOutpost, "bOutpost"); // WTP, Outpost feature
 	pXML->GetChildXmlValByName(&m_bCanal, "bCanal"); // WTP, ray, Canal - START
 	pXML->GetChildXmlValByName(&m_bDeepCanal, "bDeepCanal");
 	pXML->GetChildXmlValByName(&m_bNotAllowedNextToSameAsItself, "bNotAllowedNextToSameAsItself"); // WTP, ray, Not allowed next to itself - START
@@ -9119,6 +9128,7 @@ m_bOnlyNorthernHemisphere(false), //ray, Norther and Southern Hemisphere, using 
 m_bUseLSystem(false),
 m_bWhalingboatWorkable(false), //TAC Whaling, ray
 m_bFishingboatWorkable(false), // R&R, ray, High Sea Fishing
+m_bScavengeable(false), // WTP, Outpost feature
 m_aiYieldChange(NULL),
 m_aiImprovementChange(NULL),
 m_abTerrain(NULL),
@@ -9284,6 +9294,11 @@ bool CvBonusInfo::isFishingboatWorkable() const
 	return m_bFishingboatWorkable;
 }
 // R&R, ray, High Sea Fishing - END
+// WTP, Outpost feature
+bool CvBonusInfo::isScavengeable() const
+{
+	return m_bScavengeable;
+}
 
 bool CvBonusInfo::useLSystem() const
 {
@@ -9415,6 +9430,7 @@ void CvBonusInfo::read(FDataStreamBase* stream)
 	stream->Read(&m_bOnlyNorthernHemisphere); //ray, Norther and Southern Hemisphere, using hint of f1rpo
 	stream->Read(&m_bWhalingboatWorkable); //TAC Whaling, ray
 	stream->Read(&m_bFishingboatWorkable); //TAC Whaling, ray
+	stream->Read(&m_bScavengeable); // WTP, Outpost feature
 	stream->Read(&m_bUseLSystem);
 	stream->ReadString(m_szArtDefineTag);
 	// Arrays
@@ -9470,6 +9486,7 @@ void CvBonusInfo::write(FDataStreamBase* stream)
 	stream->Write(m_bOnlyNorthernHemisphere); //ray, Norther and Southern Hemisphere, using hint of f1rpo
 	stream->Write(m_bWhalingboatWorkable); //TAC Whaling, ray
 	stream->Write(m_bFishingboatWorkable); // R&R, ray, High Sea Fishing
+	stream->Write(m_bScavengeable); // WTP, Outpost feature
 	stream->Write(m_bUseLSystem);
 	stream->WriteString(m_szArtDefineTag);
 	// Arrays
@@ -9526,6 +9543,7 @@ bool CvBonusInfo::read(CvXMLLoadUtility* pXML)
 	pXML->GetChildXmlValByName(&m_bOnlyNorthernHemisphere, "bOnlyNorthernHemisphere"); //ray, Norther and Southern Hemisphere, using hint of f1rpo
 	pXML->GetChildXmlValByName(&m_bWhalingboatWorkable, "bWhalingboatWorkable"); //TAC Whaling, ray
 	pXML->GetChildXmlValByName(&m_bFishingboatWorkable, "bFishingboatWorkable"); // R&R, ray, High Sea Fishing
+	pXML->GetChildXmlValByName(&m_bScavengeable, "bScavengeable"); // WTP, Outpost feature
 	pXML->GetChildXmlValByName(&m_bUseLSystem, "bUseLSystem");
 	pXML->SetVariableListTagPair(&m_abTerrain, "TerrainBooleans", GC.getNumTerrainInfos(), false);
 	pXML->SetVariableListTagPair(&m_abFeature, "FeatureBooleans", GC.getNumFeatureInfos(), false);

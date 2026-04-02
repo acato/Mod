@@ -64470,6 +64470,10 @@
 					<bBuild>1</bBuild>
 				</Build>
 				<Build>
+					<BuildType>BUILD_OUTPOST</BuildType>
+					<bBuild>1</bBuild>
+				</Build>
+				<Build>
 					<BuildType>BUILD_FORT</BuildType>
 					<bBuild>1</bBuild>
 				</Build>

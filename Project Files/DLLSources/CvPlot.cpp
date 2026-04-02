@@ -311,6 +311,12 @@ void CvPlot::doTurn()
 		doImprovementUpgrade();
 	}
 
+	// WTP, Outpost feature - gather resources each turn
+	if (getImprovementType() != NO_IMPROVEMENT && getOutpostOwner() != NO_PLAYER)
+	{
+		doOutpostTurn();
+	}
+
 	//WTP, Protected Hostile Goodies - START
 	if (isGoodyForSpawningHostileAnimals())
 	{
@@ -2346,6 +2352,24 @@ bool CvPlot::canBuild(BuildTypes eBuild, PlayerTypes ePlayer, bool bTestVisible)
 		if (!canHaveImprovement(eImprovement, GET_PLAYER(ePlayer).getTeam(), bTestVisible, /* build feature removal detection - Nightinggale */ bRemoveFeature))
 		{
 			return false;
+		}
+
+		// WTP, Outpost feature - outpost requires scavengeable bonus on unowned tile with no existing improvement
+		if (GC.getImprovementInfo(eImprovement).isOutpost())
+		{
+			if (isOwned())
+			{
+				return false;
+			}
+			if (getImprovementType() != NO_IMPROVEMENT)
+			{
+				return false;
+			}
+			BonusTypes eBonus = getBonusType();
+			if (eBonus == NO_BONUS || !GC.getBonusInfo(eBonus).isScavengeable())
+			{
+				return false;
+			}
 		}
 
 		// Super Forts begin *build*
@@ -5842,6 +5866,12 @@ void CvPlot::setOwner(PlayerTypes eNewValue, bool bCheckUnits)
 			}
 		}
 
+		// WTP, Outpost feature - disband outpost if another player claims the tile
+		if (getOutpostOwner() != NO_PLAYER && eNewValue != NO_PLAYER && eNewValue != getOutpostOwner())
+		{
+			disbandOutpost(true);
+		}
+
 		m_eOwner = eNewValue;
 
 		setWorkingCityOverride(NULL);
@@ -6520,6 +6550,17 @@ void CvPlot::setImprovementType(ImprovementTypes eNewValue)
 
 	if (getImprovementType() != eNewValue)
 	{
+		// WTP, Outpost feature - if outpost is being removed externally (e.g. pillaged),
+		// clear outpost state without spawning units
+		if (getOutpostOwner() != NO_PLAYER && eOldImprovement != NO_IMPROVEMENT)
+		{
+			// Only clear if this is NOT being called from disbandOutpost itself
+			// disbandOutpost sets owner to NO_PLAYER before calling setImprovementType
+			setOutpostYieldStored(0);
+			setOutpostYieldType(NO_YIELD);
+			setOutpostOwner(NO_PLAYER);
+		}
+
 		if (getImprovementType() != NO_IMPROVEMENT)
 		{
 			if (area())
@@ -10211,6 +10252,134 @@ void CvPlot::addCrumbs(int iQuantity)
 {
 	m_iCrumbs = std::min(MAX_SHORT, m_iCrumbs + iQuantity);
 }
+
+// WTP, Outpost feature - START
+int CvPlot::getOutpostYieldStored() const
+{
+	return m_iOutpostYieldStored;
+}
+
+void CvPlot::setOutpostYieldStored(int iNewValue)
+{
+	m_iOutpostYieldStored = (short)iNewValue;
+}
+
+void CvPlot::changeOutpostYieldStored(int iChange)
+{
+	setOutpostYieldStored(getOutpostYieldStored() + iChange);
+}
+
+YieldTypes CvPlot::getOutpostYieldType() const
+{
+	return m_eOutpostYieldType;
+}
+
+void CvPlot::setOutpostYieldType(YieldTypes eYield)
+{
+	m_eOutpostYieldType = eYield;
+}
+
+PlayerTypes CvPlot::getOutpostOwner() const
+{
+	return m_eOutpostOwner;
+}
+
+void CvPlot::setOutpostOwner(PlayerTypes ePlayer)
+{
+	m_eOutpostOwner = ePlayer;
+}
+
+void CvPlot::doOutpostTurn()
+{
+	if (getOutpostOwner() == NO_PLAYER)
+	{
+		return;
+	}
+
+	if (getOutpostYieldType() == NO_YIELD)
+	{
+		return;
+	}
+
+	BonusTypes eBonus = getBonusType();
+	if (eBonus == NO_BONUS || !GC.getBonusInfo(eBonus).isScavengeable())
+	{
+		// bonus was removed or is no longer scavengeable - force disband
+		disbandOutpost(false);
+		return;
+	}
+
+	// Calculate yield as if a free colonist was working this tile (nature yield only)
+	int iYieldGathered = calculateNatureYield(getOutpostYieldType(), GET_PLAYER(getOutpostOwner()).getTeam());
+
+	changeOutpostYieldStored(iYieldGathered);
+
+	if (getOutpostYieldStored() >= 100)
+	{
+		setOutpostYieldStored(100);
+		disbandOutpost(false);
+	}
+}
+
+void CvPlot::disbandOutpost(bool bBorderExpansion)
+{
+	PlayerTypes eOwner = getOutpostOwner();
+	if (eOwner == NO_PLAYER)
+	{
+		return;
+	}
+
+	CvPlayer& kPlayer = GET_PLAYER(eOwner);
+
+	// Spawn pioneer
+	UnitClassTypes ePioneerClass = (UnitClassTypes)GC.getInfoTypeForString("UNITCLASS_PIONEER");
+	if (ePioneerClass != NO_UNITCLASS)
+	{
+		UnitTypes ePioneer = (UnitTypes)GC.getCivilizationInfo(kPlayer.getCivilizationType()).getCivilizationUnits(ePioneerClass);
+		if (ePioneer != NO_UNIT)
+		{
+			kPlayer.initUnit(ePioneer, NO_PROFESSION, coord());
+		}
+	}
+
+	// Spawn yield unit (goods cart) with accumulated goods
+	int iYield = getOutpostYieldStored();
+	if (iYield > 0)
+	{
+		YieldTypes eYield = getOutpostYieldType();
+		UnitClassTypes eUnitClass = (UnitClassTypes)GC.getYieldInfo(eYield).getUnitClass();
+		if (eUnitClass != NO_UNITCLASS)
+		{
+			UnitTypes eYieldUnit = (UnitTypes)GC.getCivilizationInfo(kPlayer.getCivilizationType()).getCivilizationUnits(eUnitClass);
+			if (eYieldUnit != NO_UNIT)
+			{
+				kPlayer.initUnit(eYieldUnit, NO_PROFESSION, coord(), NO_UNITAI, NO_DIRECTION, iYield);
+			}
+		}
+	}
+
+	// Reset outpost state before removing improvement
+	// (setImprovementType checks outpost owner to handle pillaging)
+	setOutpostYieldStored(0);
+	setOutpostYieldType(NO_YIELD);
+	setOutpostOwner(NO_PLAYER);
+
+	// Remove improvement
+	setImprovementType(NO_IMPROVEMENT);
+
+	// Notify player
+	CvWString szBuffer;
+	if (bBorderExpansion)
+	{
+		szBuffer = gDLL->getText("TXT_KEY_OUTPOST_BORDER_DISBAND");
+	}
+	else
+	{
+		szBuffer = gDLL->getText("TXT_KEY_OUTPOST_COMPLETE");
+	}
+	gDLL->UI().addPlayerMessage(eOwner, false, GC.getEVENT_MESSAGE_TIME(), szBuffer, "AS2D_DISCOVERBONUS", MESSAGE_TYPE_MINOR_EVENT, NULL, COLOR_WHITE, getX_INLINE(), getY_INLINE(), true, true);
+}
+// WTP, Outpost feature - END
 
 const char* CvPlot::getResourceLayerIcon(ResourceLayerOptions eOption, CvWStringBuffer& szHelp, PlotIndicatorVisibilityFlags& eVisibilityFlag, ColorTypes& eColor) const
 {

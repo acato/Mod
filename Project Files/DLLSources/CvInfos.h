@@ -2455,6 +2455,7 @@ public:
 	bool isActsAsCity() const;
 	bool isFort() const; // R&R, ray, Monasteries and Forts
 	bool isMonastery() const; // R&R, ray, Monasteries and Forts
+	bool isOutpost() const; // WTP, Outpost feature
 	bool isCanal() const; // WTP, ray, Canal
 	bool isDeepCanal() const;
 	bool isNotAllowedNextToSameAsItself() const; // WTP, ray, Not allowed next to itself - START
@@ -2534,6 +2535,7 @@ protected:
 	bool m_bActsAsCity;
 	bool m_bFort; // R&R, ray, Monasteries and Forts
 	bool m_bMonastery; // R&R, ray, Monasteries and Forts
+	bool m_bOutpost; // WTP, Outpost feature
 	bool m_bCanal; // WTP, ray, Canal - START
 	bool m_bDeepCanal;
 	bool m_bNotAllowedNextToSameAsItself; // WTP, ray, Not allowed next to itself - START
@@ -2610,6 +2612,7 @@ public:
 	bool isWhalingboatWorkable() const;
 	//End TAC Whaling, ray
 	bool isFishingboatWorkable() const; // R&R, ray, High Sea Fishing
+	bool isScavengeable() const; // WTP, Outpost feature
 	bool isFlatlands() const;
 	bool isNoRiverSide() const;
 	bool isRiverSideOnly() const; // Ray, adding 2 more XML tags to control bonus placement
@@ -2673,6 +2676,7 @@ protected:
 	bool m_bUseLSystem;
 	bool m_bWhalingboatWorkable; //TAC Whaling, ray
 	bool m_bFishingboatWorkable; // R&R, ray, High Sea Fishing
+	bool m_bScavengeable; // WTP, Outpost feature
 	CvString m_szArtDefineTag;
 	// Arrays
 	int* m_aiYieldChange;

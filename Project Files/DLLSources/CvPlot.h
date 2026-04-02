@@ -546,6 +546,17 @@ public:
 	int getCrumbs() const;
 	void addCrumbs(int iQuantity);
 
+	// WTP, Outpost feature
+	int getOutpostYieldStored() const;
+	void setOutpostYieldStored(int iNewValue);
+	void changeOutpostYieldStored(int iChange);
+	YieldTypes getOutpostYieldType() const;
+	void setOutpostYieldType(YieldTypes eYield);
+	PlayerTypes getOutpostOwner() const;
+	void setOutpostOwner(PlayerTypes ePlayer);
+	void doOutpostTurn();
+	void disbandOutpost(bool bBorderExpansion);
+
 	DllExport const char* getResourceLayerIcon(ResourceLayerOptions eOption, CvWStringBuffer& szHelp, PlotIndicatorVisibilityFlags& eVisibilityFlag, ColorTypes& eColor) const;
 	DllExport CvUnit* getUnitLayerUnit(UnitLayerOptionTypes eOption, CvWStringBuffer& szHelp, PlotIndicatorVisibilityFlags& eVisibilityFlag, ColorTypes& eColor, bool& bTestEnemyVisibility) const;
 
@@ -580,6 +591,11 @@ protected:
 	short m_iRiverCrossingCount;
 	short m_iDistanceToOcean;
 	short m_iCrumbs;
+	// WTP, Outpost feature
+	short m_iOutpostYieldStored;
+	YieldTypes m_eOutpostYieldType;
+	PlayerTypes m_eOutpostOwner;
+
 	// Super Forts begin *canal* *choke*
 	int m_iCanalValue;
 	int m_iChokeValue;

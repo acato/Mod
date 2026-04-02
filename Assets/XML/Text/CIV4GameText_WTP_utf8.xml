@@ -254,4 +254,28 @@
 		<English>Disallow unit from using a direct path</English>
 		<Russian>Запретить юниту использовать прямой путь</Russian>
 	</TEXT>
+	<TEXT>
+		<Tag>TXT_KEY_BUILD_OUTPOST</Tag>
+		<English>Build Outpost</English>
+	</TEXT>
+	<TEXT>
+		<Tag>TXT_KEY_BUILD_OUTPOST_HELP</Tag>
+		<English>Build an outpost to scavenge resources outside your borders. The pioneer will be restored when the outpost finishes gathering.</English>
+	</TEXT>
+	<TEXT>
+		<Tag>TXT_KEY_IMPROVEMENT_OUTPOST</Tag>
+		<English>Outpost</English>
+	</TEXT>
+	<TEXT>
+		<Tag>TXT_KEY_IMPROVEMENT_OUTPOST_PEDIA</Tag>
+		<English>An outpost is a temporary frontier installation that gathers natural resources from the surrounding wilderness. Once 100 units of goods have been collected, the outpost is dismantled and a goods cart with the harvested resources is produced along with the pioneer who built it.</English>
+	</TEXT>
+	<TEXT>
+		<Tag>TXT_KEY_OUTPOST_COMPLETE</Tag>
+		<English>Our outpost has finished gathering resources!</English>
+	</TEXT>
+	<TEXT>
+		<Tag>TXT_KEY_OUTPOST_BORDER_DISBAND</Tag>
+		<English>Our outpost has been disbanded due to foreign border expansion.</English>
+	</TEXT>
 </Civ4GameText>
