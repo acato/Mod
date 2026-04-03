@@ -284,6 +284,11 @@ build: $(Target_BIN)
 	-xcopy "..\PrivateMaps\*" "$(YOURMOD)\PrivateMaps\*" /e /y /f /d
 !ENDIF
 !ENDIF
+!IFDEF GAME_MODS_PATH
+	@ECHO Installing mod to $(GAME_MODS_PATH)
+	-xcopy "$(YOURMOD)\Assets\*" "$(GAME_MODS_PATH)\Assets\*" /e /y /d /q
+	-xcopy "$(YOURMOD)\PrivateMaps\*" "$(GAME_MODS_PATH)\PrivateMaps\*" /e /y /d /q
+!ENDIF
 
 
 precompile: Target_unfinished $(Target_PCH)
@@ -361,6 +366,8 @@ test_DllExport:
 	$(HIDE_CHAR)$(PERL) bin\DllExport.pl "$(SOURCE_DIR)"
 	$(HIDE_CHAR)$(PERL) bin\xml_validation.pl
 	$(HIDE_CHAR)$(PERL) bin\CPP_line_checker.pl
+	$(HIDE_CHAR)$(PERL) bin\test_determinism.pl
+	$(HIDE_CHAR)$(PERL) bin\test_text_keys.pl
 
 test_Python: header_building
 	$(HIDE_CHAR)$(PERL) bin\python_enum_check.pl

@@ -5973,6 +5973,8 @@ void CvCity::setUnitWorkingPlot(int iPlotIndex, int iUnitId)
 						continue;
 					if (!GC.getProfessionInfo(eLoopProfession).isWorkPlot())
 						continue;
+					if (!pUnit->canHaveProfession(eLoopProfession, false))
+						continue;
 
 					// get all yields for this candidate profession
 					const ProfessionYieldList pylLoop =
@@ -12232,6 +12234,22 @@ void CvCity::addExport(YieldTypes eYield, bool bUpdateRoutes)
 					// TAC - AI Economy - koma13 - END
 					{
 						kRoutePlayer.addTradeRoute(getIDInfo(), IDInfo((PlayerTypes) iRoutePlayer, CvTradeRoute::EUROPE_CITY_ID), eYield);
+					}
+				}
+
+				if (kRoutePlayer.isYieldAfricaTradable(eYield) && kRoutePlayer.canTradeWithAfrica())
+				{
+					if (isHuman() || isBestPortCity())
+					{
+						kRoutePlayer.addTradeRoute(getIDInfo(), IDInfo((PlayerTypes) iRoutePlayer, CvTradeRoute::AFRICA_CITY_ID), eYield);
+					}
+				}
+
+				if (kRoutePlayer.isYieldPortRoyalTradable(eYield) && kRoutePlayer.canTradeWithPortRoyal())
+				{
+					if (isHuman() || isBestPortCity())
+					{
+						kRoutePlayer.addTradeRoute(getIDInfo(), IDInfo((PlayerTypes) iRoutePlayer, CvTradeRoute::PORT_ROYAL_CITY_ID), eYield);
 					}
 				}
 			}

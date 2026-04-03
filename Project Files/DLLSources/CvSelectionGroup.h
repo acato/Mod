@@ -204,6 +204,7 @@ public:
 	void assignTradeRoute(int iRouteID, bool bAssign);
 	bool isAssignedTradeRoute(int iRouteId) const;
 	void clearTradeRoutes();
+	const std::set<int>& getTradeRoutes() const;
 
 	void speakWithChief();
 

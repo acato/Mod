@@ -10418,17 +10418,36 @@ bool CvUnit::canAssignTradeRoute(int iRouteID, bool bReusePath) const
 	if (!pf.GeneratePath(pSource->plot()))
 		return false;
 
-	// Europe destination special case (no map city)
-	if (kDst.iID == CvTradeRoute::EUROPE_CITY_ID)
+	// Off-map destination special case (Europe, Africa, Port Royal)
+	if (CvTradeRoute::isOffMapTradeLocation(kDst.iID))
 	{
 		if (canCrossCoastOnly())
 			return false;
 		if (getDomainType() != DOMAIN_SEA)
 			return false;
-		if (!kPlayer.isYieldEuropeTradable(pRoute->getYield()))
-			return false;
 
-		// TODO: Perform actual pathfinding to a reachable Europe plot
+		if (kDst.iID == CvTradeRoute::EUROPE_CITY_ID)
+		{
+			if (!kPlayer.isYieldEuropeTradable(pRoute->getYield()))
+				return false;
+		}
+		else if (kDst.iID == CvTradeRoute::AFRICA_CITY_ID)
+		{
+			if (!kPlayer.isYieldAfricaTradable(pRoute->getYield()))
+				return false;
+			if (!kPlayer.canTradeWithAfrica())
+				return false;
+		}
+		else if (kDst.iID == CvTradeRoute::PORT_ROYAL_CITY_ID)
+		{
+			if (!kPlayer.isYieldPortRoyalTradable(pRoute->getYield()))
+				return false;
+			if (!kPlayer.canTradeWithPortRoyal())
+				return false;
+			if (!canSailToPortRoyal(plot()))
+				return false;
+		}
+
 		return true;
 	}
 
@@ -14896,6 +14915,15 @@ void CvUnit::setUnitTravelState(UnitTravelStates eState, bool bShowEuropeScreen)
 
 		if (getGroup() != NULL)
 		{
+			// Save automation state before splitting, as splitGroup -> deleteUnitNode
+			// clears automation and trade routes on the old group
+			const AutomateTypes eAutomateType = getGroup()->getAutomateType();
+			std::set<int> savedTradeRoutes;
+			if (eAutomateType == AUTOMATE_TRANSPORT_ROUTES)
+			{
+				savedTradeRoutes = getGroup()->getTradeRoutes();
+			}
+
 			if (!isHuman())
 			{
 				// Erik: Unconditionally separate all units (all units will be re-assigned to a group with the unit as its single member)
@@ -14906,6 +14934,16 @@ void CvUnit::setUnitTravelState(UnitTravelStates eState, bool bShowEuropeScreen)
 				// Yield units are intentionally grouped so don't split them up
 				if (!getGroup()->getHeadUnit()->isYield())
 					getGroup()->splitGroup(1, this);
+			}
+
+			// Restore trade route automation on the new group after split
+			if (eAutomateType == AUTOMATE_TRANSPORT_ROUTES && getGroup() != NULL)
+			{
+				getGroup()->setAutomateType(AUTOMATE_TRANSPORT_ROUTES);
+				for (std::set<int>::const_iterator it = savedTradeRoutes.begin(); it != savedTradeRoutes.end(); ++it)
+				{
+					getGroup()->assignTradeRoute(*it, true);
+				}
 			}
 		}
 
