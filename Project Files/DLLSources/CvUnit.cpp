@@ -9760,6 +9760,12 @@ bool CvUnit::canDefend(const CvPlot* pPlot) const
 		pPlot = plot();
 	}
 
+	// Units traveling to/from Europe/Africa/Port Royal cannot defend
+	if (!isOnMap_())
+	{
+		return false;
+	}
+
 	if (!canFight())
 	{
 		return false;
