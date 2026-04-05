@@ -666,7 +666,7 @@ void CyGame::saveReplay(int iPlayer)
 {
 	if (m_pGame)
 	{
-		pointer(CREATE_ASSERT_DATA)->saveReplay((PlayerTypes)iPlayer);
+		((CvGame*)m_pGame)->saveReplay((PlayerTypes)iPlayer);
 	}
 }
 void CyGame::addPlayer(int eNewPlayer, int eLeader, int eCiv)
