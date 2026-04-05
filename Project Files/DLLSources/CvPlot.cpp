@@ -10359,10 +10359,12 @@ void CvPlot::disbandOutpost(bool bBorderExpansion)
 	CvPlayer& kPlayer = GET_PLAYER(eOwner);
 
 	// Spawn the founding pioneer (restoring the exact unit type that built the outpost)
+	// Use the pioneer profession so the unit comes back with tools
+	ProfessionTypes ePioneerProfession = (ProfessionTypes)GC.getInfoTypeForString("PROFESSION_PIONEER");
 	UnitTypes eFounder = getOutpostFounderUnitType();
 	if (eFounder != NO_UNIT)
 	{
-		kPlayer.initUnit(eFounder, NO_PROFESSION, coord());
+		kPlayer.initUnit(eFounder, ePioneerProfession, coord());
 	}
 	else
 	{
@@ -10373,7 +10375,7 @@ void CvPlot::disbandOutpost(bool bBorderExpansion)
 			UnitTypes ePioneer = (UnitTypes)GC.getCivilizationInfo(kPlayer.getCivilizationType()).getCivilizationUnits(ePioneerClass);
 			if (ePioneer != NO_UNIT)
 			{
-				kPlayer.initUnit(ePioneer, NO_PROFESSION, coord());
+				kPlayer.initUnit(ePioneer, ePioneerProfession, coord());
 			}
 		}
 	}
