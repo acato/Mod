@@ -6390,10 +6390,7 @@ void CvPlot::setImprovementType(ImprovementTypes eNewValue)
 			verifyUnitValidPlot();
 		}
 
-		if (GC.getGameINLINE().isDebugMode())
-		{
-			setLayoutDirty(true);
-		}
+		setLayoutDirty(true);
 
 		if (getImprovementType() != NO_IMPROVEMENT)
 		{
