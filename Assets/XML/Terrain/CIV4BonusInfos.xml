@@ -8473,6 +8473,7 @@
 					<bFeatureTerrain>1</bFeatureTerrain>
 				</FeatureTerrainBoolean>
 			</FeatureTerrainBooleans>
+					<bScavengeable>1</bScavengeable>
 		</BonusInfo>
 		<BonusInfo>
 			<Type>BONUS_DEER</Type>
@@ -8649,6 +8650,7 @@
 					<bFeatureTerrain>1</bFeatureTerrain>
 				</FeatureTerrainBoolean>
 			</FeatureTerrainBooleans>
+					<bScavengeable>1</bScavengeable>
 		</BonusInfo>
 		<BonusInfo>
 			<Type>BONUS_CARIBOU</Type>
@@ -8775,6 +8777,7 @@
 					<bFeatureTerrain>1</bFeatureTerrain>
 				</FeatureTerrainBoolean>
 			</FeatureTerrainBooleans>
+					<bScavengeable>1</bScavengeable>
 		</BonusInfo>
 		<BonusInfo>
 			<Type>BONUS_MOOSE</Type>
@@ -8901,6 +8904,7 @@
 					<bFeatureTerrain>1</bFeatureTerrain>
 				</FeatureTerrainBoolean>
 			</FeatureTerrainBooleans>
+					<bScavengeable>1</bScavengeable>
 		</BonusInfo>
 		<BonusInfo>
 			<Type>BONUS_BIG_HORN</Type>
@@ -9027,6 +9031,7 @@
 					<bFeatureTerrain>1</bFeatureTerrain>
 				</FeatureTerrainBoolean>
 			</FeatureTerrainBooleans>
+					<bScavengeable>1</bScavengeable>
 		</BonusInfo>
 		<BonusInfo>
 			<Type>BONUS_MUSK_OX</Type>
@@ -9153,6 +9158,7 @@
 					<bFeatureTerrain>1</bFeatureTerrain>
 				</FeatureTerrainBoolean>
 			</FeatureTerrainBooleans>
+					<bScavengeable>1</bScavengeable>
 		</BonusInfo>
 		<BonusInfo>
 			<Type>BONUS_CAPYBARA</Type>
@@ -9263,6 +9269,7 @@
 					<bFeatureTerrain>1</bFeatureTerrain>
 				</FeatureTerrainBoolean>
 			</FeatureTerrainBooleans>
+					<bScavengeable>1</bScavengeable>
 		</BonusInfo>
 		<BonusInfo>
 			<Type>BONUS_TAPIR</Type>
@@ -9373,6 +9380,7 @@
 					<bFeatureTerrain>1</bFeatureTerrain>
 				</FeatureTerrainBoolean>
 			</FeatureTerrainBooleans>
+					<bScavengeable>1</bScavengeable>
 		</BonusInfo>
 		<BonusInfo>
 			<Type>BONUS_LLAMA</Type>
@@ -9503,6 +9511,7 @@
 					<bFeatureTerrain>1</bFeatureTerrain>
 				</FeatureTerrainBoolean>
 			</FeatureTerrainBooleans>
+					<bScavengeable>1</bScavengeable>
 		</BonusInfo>
 		<BonusInfo>
 			<Type>BONUS_GUINEA_PIG</Type>
@@ -9637,6 +9646,7 @@
 					<bFeatureTerrain>1</bFeatureTerrain>
 				</FeatureTerrainBoolean>
 			</FeatureTerrainBooleans>
+					<bScavengeable>1</bScavengeable>
 		</BonusInfo>
 		<BonusInfo>
 			<Type>BONUS_RABBIT</Type>
@@ -9794,6 +9804,7 @@
 					<bFeatureTerrain>1</bFeatureTerrain>
 				</FeatureTerrainBoolean>
 			</FeatureTerrainBooleans>
+					<bScavengeable>1</bScavengeable>
 		</BonusInfo>
 		<BonusInfo>
 			<Type>BONUS_IGUANA</Type>
@@ -10885,6 +10896,7 @@
 					<bFeatureTerrain>1</bFeatureTerrain>
 				</FeatureTerrainBoolean>
 			</FeatureTerrainBooleans>
+					<bScavengeable>1</bScavengeable>
 		</BonusInfo>
 		<BonusInfo>
 			<Type>BONUS_SUGAR</Type>
